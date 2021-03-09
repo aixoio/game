@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas Game</title>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+</body>
+<footer>
+	<script type="text/javascript">
+		var canvas = document.getElementById("canvas");
+		var context = canvas.getContext("2d");
+		var px = 32;
+		var py = 548;
+		var pw = 20;
+		var ph = 50;
+		var v = 10;
+		const mintoWin = 5;
+		var score = 0;
+		var updateinet;
+		var scoreaddsXYS = [
+			{
+				x: 92,
+				y: 548
+			},
+			{
+				x: 172,
+				y: 518
+			},
+			{
+				x: 242,
+				y: 548
+			},
+			{
+				x: 322,
+				y: 518
+			},
+			{
+				x: 402,
+				y: 548
+			},
+			{
+				x: 472,
+				y: 518
+			},
+			{
+				x: 542,
+				y: 548
+			},
+			{
+				x: 602,
+				y: 518
+			},
+			{
+				x: 662,
+				y: 548
+			},
+			{
+				x: 702,
+				y: 518
+			}
+		];
+		var scoreadds = [];
+		var exit;
+		function ScoreAdder(x, y, w, h, c) {
+			this.x = x;
+			this.y = y;
+			this.width = w;
+			this.height = h;
+			this.color = c;
+			this.hidden = false;
+			this.draw = function () {
+				if (this.hidden == false) {
+					context.fillStyle = this.color;
+					context.fillRect(this.x, this.y, this.width, this.height);
+				}
+			}
+			this.update = function () {
+				if (this.x < (px + pw) && (this.x + this.width) > px && this.y < (py + ph) && (this.y + this.height) > py && this.hidden == false) {
+					score += 1;
+					this.hidden = true;
+					if (score >= mintoWin) {
+						exit.open = true;
+					} else {
+						exit.open = false;
+					}
+				}
+			}
+		}
+		function Exit(x, y, w, h, c) {
+			this.x = x;
+			this.y = y;
+			this.width = w;
+			this.height = h;
+			this.color = c;
+			this.hidden = false;
+			this.open = false;
+			this.draw = function () {
+				if (this.hidden == false) {
+					context.fillStyle = this.color.background;
+					context.fillRect(this.x, this.y, (this.width + 10), (this.height + 10));
+					if (this.open == true) {
+						context.fillStyle = this.color.open;
+					} else {
+						context.fillStyle = this.color.notOpen;
+					}
+					context.fillRect((this.x + 5), (this.y + 5), this.width, this.height);
+				}
+			}
+			this.open = function () {
+				this.open = true;
+			}
+			this.close = function () {
+				this.open = false;
+			}
+			this.update = function () {
+				if ((this.x + 5) < (px + pw) && ((this.x + 5) + this.width) > px && (this.y + 5) < (py + ph) && ((this.y + 5) + this.height) > py && this.hidden == false && this.open == true) {
+					this.hidden = true;
+					win();
+				}
+			}
+		}
+		document.body.onload =  function() {
+			canvas.width = 800;
+			canvas.height = 600;
+			for (let i = 0; i < scoreaddsXYS.length; i++) {
+				scoreadds.push(new ScoreAdder(scoreaddsXYS[i].x, scoreaddsXYS[i].y, 10, 10, "#ffa500"));
+			}
+			exit = new Exit(742, 548, 20, 20, {
+				open: "#00ff00",
+				notOpen: "#ff0000",
+				background: "#ffffff"
+			});
+			updateinet = setInterval(update, (1000 / 30));
+		};
+		function update() {
+			context.fillStyle = "#000000";
+			context.fillRect(0, 0, canvas.width, canvas.height);
+			while (px < 0) {
+				px += 5;
+			}
+			while (px > 780) {
+				px += -5;
+			}
+			while (py < 0 && py !== 548) {
+				py += 5;
+			}
+			if (py !== 548) {
+				py += 5;
+				if (py > 548) {
+					py = 548;
+				}
+			}
+			for (var i = 0; i < scoreadds.length; i++) {
+				scoreadds[i].update();
+				scoreadds[i].draw();
+			}
+			exit.update();
+			exit.draw();
+			context.fillStyle = "#00ff00";
+			context.fillRect(px, py, pw, ph);
+			context.fillStyle = "#00ffff";
+			context.font = "15px Verdana";
+			context.fillText("Score: " + score, 100, 100);
+		};
+		document.body.onkeydown =  function(event) {
+			if (event.keyCode == 38) {
+				py += (v - (v * 10));
+			} else if (event.keyCode == 37) {
+				px += (v - (v + v));
+			} else if (event.keyCode == 39) {
+				px += v;
+			}
+		};
+		function win() {
+			clearInterval(updateinet);
+			setTimeout(function () {
+				context.fillStyle = "#000000";
+				context.fillRect(0, 0, canvas.width, canvas.height);
+				context.fillStyle = "#00ffff";
+				context.font = "25px Verdana";
+				context.fillText("You Win!", (((canvas.width / 2) - 25) - 8), (((canvas.height / 2) - 25) - 8));
+			}, 20);
+		}
+	</script>
+</footer>
+</html>
